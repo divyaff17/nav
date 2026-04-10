@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Direction Navigator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="navigator-app">
+    <header class="app-head">
+      <h1>Campus Direction Navigator</h1>
+      <p>Pick start and destination. Follow each real photo with arrow overlay.</p>
+    </header>
+
+    <section class="route-controls">
+      <div class="field">
+        <label for="fromSelect">Start</label>
+        <select id="fromSelect"></select>
+      </div>
+      <button id="swapBtn" class="icon-btn" type="button" title="Swap">⇄</button>
+      <div class="field">
+        <label for="toSelect">Destination</label>
+        <select id="toSelect"></select>
+      </div>
+      <button id="buildBtn" class="primary-btn" type="button">Build Route</button>
+    </section>
+
+    <section id="routeSummary" class="route-summary hidden"></section>
+
+    <section id="stage" class="stage hidden">
+      <div class="stage-top">
+        <strong id="stepTitle"></strong>
+        <span id="stepCounter"></span>
+      </div>
+
+      <div class="photo-frame">
+        <img id="stepPhoto" alt="Direction step photo" />
+        <div id="arrowOverlay" class="arrow-overlay">
+          <svg id="arrowSvg" viewBox="0 0 120 120" aria-hidden="true"></svg>
+          <span id="arrowText"></span>
+        </div>
+      </div>
+
+      <p id="stepDesc" class="step-desc"></p>
+
+      <div class="step-actions">
+        <button id="prevBtn" class="ghost-btn" type="button">← Previous</button>
+        <button id="nextBtn" class="primary-btn" type="button">Next →</button>
+      </div>
+    </section>
+
+    <section id="timeline" class="timeline hidden"></section>
+    <p id="feedback" class="feedback"></p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
