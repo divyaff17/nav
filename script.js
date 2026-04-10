@@ -15,14 +15,19 @@ const places = {
 };
 
 const edges = [
-  // Kings to Library sequence (3 steps)
-  { from: "kings", to: "wp_k1", dir: "straight", photo: "images/lobby.jpg", text: "Walk straight out of King's Lounge toward the main lobby." },
+  // Unified Starting Step for all King's Lounge routes
+  { from: "kings", to: "wp_start", dir: "straight", photo: "images/hall_center.jpg", text: "Exit King's Lounge into the center hall." },
+
+  // Center Hall to Main Entrance
+  { from: "wp_start", to: "entrance", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk down the corridor to the Main Entrance." },
+
+  // Center Hall to Library sequence
+  { from: "wp_start", to: "wp_k1", dir: "right", photo: "images/lobby.jpg", text: "Walk toward the main lobby." },
   { from: "wp_k1", to: "wp_k2", dir: "right", photo: "images/corridor_west.jpg", text: "Take the West corridor." },
   { from: "wp_k2", to: "library", dir: "left", photo: "images/walkway.jpg", text: "Follow the walkway into the Library wing." },
 
-  // Kings to Indigenous sequence (3 steps)
-  { from: "kings", to: "wp_i1", dir: "left", photo: "images/hall_center.jpg", text: "Head left into the Center Hall." },
-  { from: "wp_i1", to: "wp_i2", dir: "straight", photo: "images/hall_turn.jpg", text: "Continue straight past the turn." },
+  // Center Hall to Indigenous sequence
+  { from: "wp_start", to: "wp_i2", dir: "left", photo: "images/hall_turn.jpg", text: "Continue straight past the turn." },
   { from: "wp_i2", to: "indigenous", dir: "right", photo: "images/entrance.jpg", text: "Turn right toward the Indigenous Center." },
 
   // Indigenous to Theater sequence (3 steps)
