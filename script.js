@@ -1,7 +1,6 @@
 /*
  * App Logic for Campus Navigator
  * Divya
- * Note: images are kinda huge so added a preloader spinner so it doesn't look broken
  */
 
 const places = {
@@ -66,7 +65,6 @@ edges.forEach(edge => {
 const fromSelect = document.getElementById("fromSelect");
 const toSelect = document.getElementById("toSelect");
 const buildBtn = document.getElementById("buildBtn");
-// swapBtn removed since start is fixed
 const routeSummary = document.getElementById("routeSummary");
 const stage = document.getElementById("stage");
 const timeline = document.getElementById("timeline");
@@ -90,8 +88,6 @@ let currentStepIndex = 0;
 // populate dropdowns
 populateSelects();
 
-// swap button logic removed
-
 buildBtn.addEventListener("click", () => {
   feedback.textContent = "";
   const start = "kings"; // hardcoded fixed start
@@ -107,7 +103,6 @@ buildBtn.addEventListener("click", () => {
     return;
   }
 
-  // TODO: maybe abstract this routing block later if it gets too complex
   const pathEdges = findShortestRoute(start, end);
   if (!pathEdges.length) {
     feedback.textContent = "No route found for this combination.";
@@ -260,7 +255,6 @@ function populateSelects() {
 
 // standard bfs routing
 function findShortestRoute(start, end) {
-  // old way: var queue = [{ node: start, path: [] }]; 
   const queue = [{ node: start, path: [] }];
   const visited = { [start]: true };
 
@@ -283,7 +277,7 @@ function findShortestRoute(start, end) {
 }
 
 function drawArrow(dir) {
-  const color = dir === "arrive" ? "#34d399" : "#60a5fa"; // using hex instead of removed css vars
+  const color = dir === "arrive" ? "#34d399" : "#60a5fa";
   let path = "";
 
   if (dir === "left") {

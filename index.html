@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- author info -->
-  <meta name="author" content="Divya">
-  <!-- TODO: maybe add some meta description later for seo -->
+  <meta name="author" content="kush patel">
 
   <title>Campus Navigator</title>
   
@@ -18,8 +17,6 @@
 </head>
 <body>
 
-  <!-- animated background blobs -->
-  <!-- <div class="bg-static"></div> old static bg -->
   <div class="ambient-bg">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -39,9 +36,6 @@
           🛋 King's Lounge
         </div>
       </div>
-      
-      <!-- swap button removed since we only start at king's lounge now -->
-
       <div class="field">
         <label for="toSelect">Destination</label>
         <div class="select-wrapper">
@@ -50,11 +44,8 @@
       </div>
       <button id="buildBtn" class="primary-btn" type="button">Find Route</button>
     </section>
-
-    <!-- validation errors go here -->
     <p id="feedback" class="feedback"></p>
 
-    <!-- quick route info (hidden by default) -->
     <section id="routeSummary" class="route-summary hidden"></section>
 
     <section id="stage" class="stage hidden">
@@ -63,7 +54,6 @@
         <span id="stepCounter" class="step-counter"></span>
       </div>
 
-      <!-- the main photo area -->
       <div class="photo-frame-wrapper">
         <div id="imageLoader" class="skeleton-loader fade">
           <div class="spinner"></div>
@@ -79,7 +69,6 @@
         </div>
       </div>
 
-      <!-- description text -->
       <p id="stepDesc" class="step-desc fade"></p>
 
       <div class="step-actions">
@@ -94,8 +83,6 @@
       </div>
     </section>
 
-    <!-- timeline at the bottom -->
-    <!-- maybe add horizontal scroll if it gets too long later -->
     <section id="timeline" class="timeline hidden"></section>
   </main>
 
