@@ -242,6 +242,8 @@ button {
 }
 
 #arrowOverlay svg {
+  display: block;
+  margin: 0 auto;
   width: 120px;
   height: 120px;
   animation: floatArrow 3s ease-in-out infinite;
