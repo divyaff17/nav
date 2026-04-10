@@ -16,7 +16,7 @@ const places = {
 
 const edges = [
   { from: "entrance", to: "kings", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk straight from the entrance lobby into the north corridor." },
-  { from: "kings", to: "library", dir: "right", photo: "images/corridor_lib.jpg", text: "Turn right from King's Lounge and continue to the Library wing." },
+  { from: "kings", to: "library", dir: "right", photo: "images/walkway.jpg", text: "Turn right from King's Lounge and continue to the Library wing." },
   { from: "library", to: "registrar", dir: "right", photo: "images/corridor_reg.jpg", text: "Take the right-side office corridor to reach Registrar Office." },
   { from: "kings", to: "indigenous", dir: "left", photo: "images/hall_center.jpg", text: "From King's Lounge, turn left and move toward the cultural center." },
   { from: "indigenous", to: "theater", dir: "straight", photo: "images/theater_area.jpg", text: "Continue straight from Indigenous Center to Theater side." },
@@ -264,9 +264,8 @@ function findShortestRoute(start, end) {
   return []; // no route
 }
 
-// simple inline svg drawing for the arrows
 function drawArrow(dir) {
-  const color = dir === "arrive" ? "var(--accent-arrive)" : "var(--accent-glow)";
+  const color = dir === "arrive" ? "#34d399" : "#60a5fa"; // using hex instead of removed css vars
   let path = "";
 
   if (dir === "left") {
