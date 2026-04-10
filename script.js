@@ -304,7 +304,8 @@ function getArrivalPhoto(place) {
     registrar: "images/corridor_reg.jpg",
     indigenous: "images/hall_center.jpg",
     theater: "images/theater_area.jpg",
-    it: "images/corridor_it.jpg"
+    it: "images/corridor_it.jpg",
+    entrance: "images/hallway_main.jpg"
   };
-  return arrivalPhotos[place] || "images/entrance.jpg";
+  return arrivalPhotos[place] || "images/hallway_main.jpg";
 }
