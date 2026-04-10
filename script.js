@@ -1,4 +1,4 @@
-var places = {
+const places = {
   entrance: { name: "Main Entrance", icon: "🏫" },
   library: { name: "Library", icon: "📚" },
   kings: { name: "King's Lounge", icon: "🛋" },
@@ -8,7 +8,7 @@ var places = {
   it: { name: "IT Department", icon: "💻" }
 };
 
-var edges = [
+const edges = [
   { from: "entrance", to: "kings", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk straight from the entrance lobby into the north corridor." },
   { from: "kings", to: "library", dir: "right", photo: "images/corridor_lib.jpg", text: "Turn right from King's Lounge and continue to the Library wing." },
   { from: "library", to: "registrar", dir: "right", photo: "images/corridor_reg.jpg", text: "Take the right-side office corridor to reach Registrar Office." },
@@ -21,11 +21,13 @@ var edges = [
   { from: "entrance", to: "it", dir: "right", photo: "images/passage_b.jpg", text: "Take the right junction and follow east passage to IT." }
 ];
 
-var byFrom = {};
-edges.forEach(function(edge) {
+// Graph preparation
+const byFrom = {};
+edges.forEach(edge => {
   if (!byFrom[edge.from]) byFrom[edge.from] = [];
   if (!byFrom[edge.to]) byFrom[edge.to] = [];
   byFrom[edge.from].push(edge);
+  // Add reverse edges implicitly
   byFrom[edge.to].push({
     from: edge.to,
     to: edge.from,
@@ -35,124 +37,217 @@ edges.forEach(function(edge) {
   });
 });
 
-var fromSelect = document.getElementById("fromSelect");
-var toSelect = document.getElementById("toSelect");
-var buildBtn = document.getElementById("buildBtn");
-var swapBtn = document.getElementById("swapBtn");
-var routeSummary = document.getElementById("routeSummary");
-var stage = document.getElementById("stage");
-var timeline = document.getElementById("timeline");
-var feedback = document.getElementById("feedback");
+// DOM Elements
+const fromSelect = document.getElementById("fromSelect");
+const toSelect = document.getElementById("toSelect");
+const buildBtn = document.getElementById("buildBtn");
+const swapBtn = document.getElementById("swapBtn");
+const routeSummary = document.getElementById("routeSummary");
+const stage = document.getElementById("stage");
+const timeline = document.getElementById("timeline");
+const feedback = document.getElementById("feedback");
 
-var stepTitle = document.getElementById("stepTitle");
-var stepCounter = document.getElementById("stepCounter");
-var stepPhoto = document.getElementById("stepPhoto");
-var arrowSvg = document.getElementById("arrowSvg");
-var arrowText = document.getElementById("arrowText");
-var stepDesc = document.getElementById("stepDesc");
-var prevBtn = document.getElementById("prevBtn");
-var nextBtn = document.getElementById("nextBtn");
+const stepTitle = document.getElementById("stepTitle");
+const stepCounter = document.getElementById("stepCounter");
+const stepPhoto = document.getElementById("stepPhoto");
+const arrowSvg = document.getElementById("arrowSvg");
+const arrowText = document.getElementById("arrowText");
+const stepDesc = document.getElementById("stepDesc");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
-var currentSteps = [];
-var currentStepIndex = 0;
+const photoFrame = document.getElementById("photoFrame");
+const imageLoader = document.getElementById("imageLoader");
 
+// State
+let currentSteps = [];
+let currentStepIndex = 0;
+
+// Initialize
 populateSelects();
 
-swapBtn.addEventListener("click", function() {
-  var temp = fromSelect.value;
+// Event Listeners
+swapBtn.addEventListener("click", () => {
+  const temp = fromSelect.value;
   fromSelect.value = toSelect.value;
   toSelect.value = temp;
 });
 
-buildBtn.addEventListener("click", function() {
+buildBtn.addEventListener("click", () => {
   feedback.textContent = "";
-  var start = fromSelect.value;
-  var end = toSelect.value;
+  const start = fromSelect.value;
+  const end = toSelect.value;
 
   if (!start || !end) {
-    feedback.textContent = "Select both start and destination.";
+    feedback.textContent = "Select both a starting point and a destination.";
     return;
   }
   if (start === end) {
-    feedback.textContent = "Start and destination are same.";
+    feedback.textContent = "Start and destination cannot be the same.";
     return;
   }
 
-  var pathEdges = findShortestRoute(start, end);
+  const pathEdges = findShortestRoute(start, end);
   if (!pathEdges.length) {
     feedback.textContent = "No route found for this combination.";
     return;
   }
 
-  currentSteps = pathEdges.map(function(edge, i) {
-    return {
-      title: "Step " + (i + 1) + " - " + directionLabel(edge.dir),
-      desc: edge.text,
-      photo: edge.photo,
-      dir: edge.dir
-    };
-  });
+  // Pre-calculate steps
+  currentSteps = pathEdges.map((edge, i) => ({
+    title: `Step ${i + 1} - ${directionLabel(edge.dir)}`,
+    desc: edge.text,
+    photo: edge.photo,
+    dir: edge.dir
+  }));
 
   currentSteps.push({
     title: "Arrived",
-    desc: "You reached " + places[end].name + ".",
+    desc: `You have successfully reached the ${places[end].name}.`,
     photo: getArrivalPhoto(end),
     dir: "arrive"
   });
 
   currentStepIndex = 0;
+  
+  // Show UI elements
   routeSummary.classList.remove("hidden");
   stage.classList.remove("hidden");
   timeline.classList.remove("hidden");
-  routeSummary.textContent = places[start].icon + " " + places[start].name + " → " + places[end].icon + " " + places[end].name + "  |  " + currentSteps.length + " steps";
+  
+  routeSummary.innerHTML = `
+    <span>${places[start].icon} ${places[start].name}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <span>${places[end].icon} ${places[end].name}</span>
+    <span style="opacity:0.5; margin-left:10px;">|</span>
+    <span style="margin-left:10px;">${currentSteps.length} steps</span>
+  `;
+  
   renderStep();
   renderTimeline();
 });
 
-prevBtn.addEventListener("click", function() {
+prevBtn.addEventListener("click", () => {
   if (currentStepIndex > 0) {
-    currentStepIndex -= 1;
+    currentStepIndex--;
     renderStep();
     renderTimeline();
   }
 });
 
-nextBtn.addEventListener("click", function() {
+nextBtn.addEventListener("click", () => {
   if (currentStepIndex < currentSteps.length - 1) {
-    currentStepIndex += 1;
+    currentStepIndex++;
     renderStep();
     renderTimeline();
   }
 });
+
+function renderStep() {
+  const step = currentSteps[currentStepIndex];
+  
+  // Start transition out
+  photoFrame.classList.remove('in');
+  photoFrame.classList.add('out');
+  stepDesc.classList.remove('in');
+  stepDesc.classList.add('out');
+  
+  // Disable buttons during transition
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
+
+  // Wait for fade out
+  setTimeout(() => {
+    stepTitle.textContent = step.title;
+    stepCounter.textContent = `Step ${currentStepIndex + 1} of ${currentSteps.length}`;
+    stepDesc.textContent = step.desc;
+    arrowText.textContent = directionLabel(step.dir);
+    drawArrow(step.dir);
+    
+    // Show loader
+    imageLoader.classList.remove('out');
+    imageLoader.classList.add('in');
+    
+    // Preload image
+    const img = new Image();
+    img.onload = () => {
+      stepPhoto.src = step.photo;
+      
+      // Hide loader, show frame
+      imageLoader.classList.remove('in');
+      imageLoader.classList.add('out');
+      
+      photoFrame.classList.remove('out');
+      photoFrame.classList.add('in');
+      
+      stepDesc.classList.remove('out');
+      stepDesc.classList.add('in');
+      
+      // Re-enable buttons based on state
+      prevBtn.disabled = currentStepIndex === 0;
+      nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
+    };
+    
+    // Fallback if image fails or takes too long (timeout)
+    img.onerror = () => {
+      stepPhoto.src = step.photo; // Let the browser handle broken image icon naturally
+      imageLoader.classList.add('out');
+      photoFrame.classList.add('in');
+      stepDesc.classList.add('in');
+      prevBtn.disabled = currentStepIndex === 0;
+      nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
+    };
+    
+    img.src = step.photo;
+  }, 300);
+}
+
+function renderTimeline() {
+  timeline.innerHTML = "";
+  currentSteps.forEach((step, index) => {
+    const card = document.createElement("article");
+    card.className = "timeline-card glass-panel" + (index === currentStepIndex ? " active" : "");
+    
+    card.innerHTML = `
+      <img src="${step.photo}" alt="${step.title}">
+      <p>${index + 1}. ${directionLabel(step.dir)}</p>
+    `;
+    
+    card.addEventListener("click", () => {
+      if (currentStepIndex !== index) {
+        currentStepIndex = index;
+        renderStep();
+        renderTimeline();
+      }
+    });
+    
+    timeline.appendChild(card);
+  });
+}
 
 function populateSelects() {
-  var keys = Object.keys(places);
-  fromSelect.innerHTML = '<option value="">Select start</option>';
-  toSelect.innerHTML = '<option value="">Select destination</option>';
-  keys.forEach(function(key) {
-    var option1 = document.createElement("option");
-    option1.value = key;
-    option1.textContent = places[key].icon + " " + places[key].name;
-    fromSelect.appendChild(option1);
-
-    var option2 = document.createElement("option");
-    option2.value = key;
-    option2.textContent = places[key].icon + " " + places[key].name;
-    toSelect.appendChild(option2);
+  fromSelect.innerHTML = '<option value="" disabled selected>Select Starting Point...</option>';
+  toSelect.innerHTML = '<option value="" disabled selected>Select Destination...</option>';
+  
+  Object.keys(places).forEach(key => {
+    const place = places[key];
+    const optionText = `${place.icon} ${place.name}`;
+    
+    fromSelect.appendChild(new Option(optionText, key));
+    toSelect.appendChild(new Option(optionText, key));
   });
 }
 
 function findShortestRoute(start, end) {
-  var queue = [{ node: start, path: [] }];
-  var visited = {};
-  visited[start] = true;
+  const queue = [{ node: start, path: [] }];
+  const visited = { [start]: true };
 
   while (queue.length) {
-    var current = queue.shift();
+    const current = queue.shift();
     if (current.node === end) return current.path;
 
-    var neighbors = byFrom[current.node] || [];
-    neighbors.forEach(function(edge) {
+    const neighbors = byFrom[current.node] || [];
+    neighbors.forEach(edge => {
       if (!visited[edge.to]) {
         visited[edge.to] = true;
         queue.push({
@@ -162,52 +257,25 @@ function findShortestRoute(start, end) {
       }
     });
   }
-
   return [];
 }
 
-function renderStep() {
-  var step = currentSteps[currentStepIndex];
-  stepTitle.textContent = step.title;
-  stepCounter.textContent = "Step " + (currentStepIndex + 1) + " / " + currentSteps.length;
-  stepPhoto.src = step.photo;
-  stepDesc.textContent = step.desc;
-  arrowText.textContent = directionLabel(step.dir);
-  drawArrow(step.dir);
-  prevBtn.disabled = currentStepIndex === 0;
-  nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
-}
-
-function renderTimeline() {
-  timeline.innerHTML = "";
-  currentSteps.forEach(function(step, index) {
-    var card = document.createElement("article");
-    card.className = "timeline-card" + (index === currentStepIndex ? " active" : "");
-    card.innerHTML = '<img src="' + step.photo + '" alt="' + step.title + '"><p>' + (index + 1) + ". " + directionLabel(step.dir) + "</p>";
-    card.addEventListener("click", function() {
-      currentStepIndex = index;
-      renderStep();
-      renderTimeline();
-    });
-    timeline.appendChild(card);
-  });
-}
-
 function drawArrow(dir) {
-  var color = dir === "arrive" ? "#22c55e" : "#ffdf4d";
-  var path = "";
+  const color = dir === "arrive" ? "var(--accent-arrive)" : "var(--accent-glow)";
+  let path = "";
 
   if (dir === "left") {
-    path = '<g transform="translate(60 60) rotate(-90) translate(-60 -60)"><path d="M60 12L60 94"/><path d="M35 40L60 12L85 40"/></g>';
+    path = '<g transform="translate(60 60) rotate(-90) translate(-60 -60)"><path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/></g>';
   } else if (dir === "right") {
-    path = '<g transform="translate(60 60) rotate(90) translate(-60 -60)"><path d="M60 12L60 94"/><path d="M35 40L60 12L85 40"/></g>';
+    path = '<g transform="translate(60 60) rotate(90) translate(-60 -60)"><path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/></g>';
   } else if (dir === "arrive") {
-    path = '<circle cx="60" cy="60" r="34"/><path d="M43 60l11 11 24-24"/>';
+    path = '<circle cx="60" cy="60" r="36"/><path d="M42 60l12 12 24-24"/>';
   } else {
-    path = '<path d="M60 12L60 94"/><path d="M35 40L60 12L85 40"/>';
+    // straight
+    path = '<path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/>';
   }
 
-  arrowSvg.innerHTML = '<g stroke="' + color + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">' + path + '</g>';
+  arrowSvg.innerHTML = `<g stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">${path}</g>`;
 }
 
 function directionLabel(dir) {
@@ -224,11 +292,13 @@ function reverseDir(dir) {
 }
 
 function getArrivalPhoto(place) {
-  if (place === "library") return "images/corridor_lib.jpg";
-  if (place === "kings") return "images/corridor_kings.jpg";
-  if (place === "registrar") return "images/corridor_reg.jpg";
-  if (place === "indigenous") return "images/hall_center.jpg";
-  if (place === "theater") return "images/theater_area.jpg";
-  if (place === "it") return "images/corridor_it.jpg";
-  return "images/entrance.jpg";
+  const arrivalPhotos = {
+    library: "images/corridor_lib.jpg",
+    kings: "images/corridor_kings.jpg",
+    registrar: "images/corridor_reg.jpg",
+    indigenous: "images/hall_center.jpg",
+    theater: "images/theater_area.jpg",
+    it: "images/corridor_it.jpg"
+  };
+  return arrivalPhotos[place] || "images/entrance.jpg";
 }
