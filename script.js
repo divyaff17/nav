@@ -15,16 +15,29 @@ const places = {
 };
 
 const edges = [
-  { from: "entrance", to: "kings", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk straight from the entrance lobby into the north corridor." },
-  { from: "kings", to: "library", dir: "right", photo: "images/walkway.jpg", text: "Turn right from King's Lounge and continue to the Library wing." },
-  { from: "library", to: "registrar", dir: "right", photo: "images/passage_a.jpg", text: "Take the right-side office corridor to reach Registrar Office." },
-  { from: "kings", to: "indigenous", dir: "left", photo: "images/hall_turn.jpg", text: "From King's Lounge, turn left and move toward the cultural center." },
-  { from: "indigenous", to: "theater", dir: "straight", photo: "images/hall_theater.jpg", text: "Continue straight from Indigenous Center to Theater side." },
-  { from: "registrar", to: "it", dir: "right", photo: "images/passage_c.jpg", text: "From Registrar Office, turn right and follow the east wing to IT." },
-  { from: "entrance", to: "library", dir: "right", photo: "images/junction.jpg", text: "Go straight then turn right at the junction to Library." },
-  { from: "entrance", to: "theater", dir: "left", photo: "images/walkway.jpg", text: "From entrance, take left corridor toward the theater block." },
-  { from: "entrance", to: "registrar", dir: "right", photo: "images/corridor_east.jpg", text: "Move straight and turn right to office corridors." },
-  { from: "entrance", to: "it", dir: "right", photo: "images/passage_b.jpg", text: "Take the right junction and follow east passage to IT." }
+  // Kings to Library sequence (3 steps)
+  { from: "kings", to: "wp_k1", dir: "straight", photo: "images/lobby.jpg", text: "Walk straight out of King's Lounge toward the main lobby." },
+  { from: "wp_k1", to: "wp_k2", dir: "right", photo: "images/corridor_west.jpg", text: "Take the West corridor." },
+  { from: "wp_k2", to: "library", dir: "left", photo: "images/walkway.jpg", text: "Follow the walkway into the Library wing." },
+
+  // Kings to Indigenous sequence (3 steps)
+  { from: "kings", to: "wp_i1", dir: "left", photo: "images/hall_center.jpg", text: "Head left into the Center Hall." },
+  { from: "wp_i1", to: "wp_i2", dir: "straight", photo: "images/hall_turn.jpg", text: "Continue straight past the turn." },
+  { from: "wp_i2", to: "indigenous", dir: "right", photo: "images/entrance.jpg", text: "Turn right toward the Indigenous Center." },
+
+  // Indigenous to Theater sequence (3 steps)
+  { from: "indigenous", to: "wp_t1", dir: "left", photo: "images/hallway_south.jpg", text: "Take the south hallway." },
+  { from: "wp_t1", to: "wp_t2", dir: "straight", photo: "images/hall_theater.jpg", text: "Move through the theater hall." },
+  { from: "wp_t2", to: "theater", dir: "straight", photo: "images/passage_a.jpg", text: "Proceed down Passage A to the Theater." },
+
+  // Library to Registrar sequence (2 steps)
+  { from: "library", to: "wp_r1", dir: "right", photo: "images/junction.jpg", text: "Turn right at the main junction." },
+  { from: "wp_r1", to: "registrar", dir: "left", photo: "images/corridor_east.jpg", text: "Enter the East corridor toward Registrar." },
+
+  // Registrar to IT sequence (3 steps)
+  { from: "registrar", to: "wp_it1", dir: "straight", photo: "images/passage_b.jpg", text: "Walk down Passage B." },
+  { from: "wp_it1", to: "wp_it2", dir: "right", photo: "images/passage_c.jpg", text: "Turn right into Passage C." },
+  { from: "wp_it2", to: "it", dir: "straight", photo: "images/hallway_north.jpg", text: "Follow the North hallway to IT." }
 ];
 
 // build the map so we can look up routes locally 
@@ -301,7 +314,7 @@ function getArrivalPhoto(place) {
     library: "images/corridor_lib.jpg",
     kings: "images/corridor_kings.jpg",
     registrar: "images/corridor_reg.jpg",
-    indigenous: "images/hall_center.jpg",
+    indigenous: "images/hallway_board.jpg",
     theater: "images/theater_area.jpg",
     it: "images/corridor_it.jpg",
     entrance: "images/hallway_main.jpg"
