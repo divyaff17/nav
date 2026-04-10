@@ -1,3 +1,9 @@
+/*
+ * App Logic for Campus Navigator
+ * Divya
+ * Note: images are kinda huge so added a preloader spinner so it doesn't look broken
+ */
+
 const places = {
   entrance: { name: "Main Entrance", icon: "🏫" },
   library: { name: "Library", icon: "📚" },
@@ -21,13 +27,15 @@ const edges = [
   { from: "entrance", to: "it", dir: "right", photo: "images/passage_b.jpg", text: "Take the right junction and follow east passage to IT." }
 ];
 
-// Graph preparation
-const byFrom = {};
+// build the map so we can look up routes locally 
+let byFrom = {}; // changing to let just in case we fetch data later
 edges.forEach(edge => {
   if (!byFrom[edge.from]) byFrom[edge.from] = [];
   if (!byFrom[edge.to]) byFrom[edge.to] = [];
+  
   byFrom[edge.from].push(edge);
-  // Add reverse edges implicitly
+  
+  // push the reverse path automatically
   byFrom[edge.to].push({
     from: edge.to,
     to: edge.from,
@@ -37,11 +45,10 @@ edges.forEach(edge => {
   });
 });
 
-// DOM Elements
 const fromSelect = document.getElementById("fromSelect");
 const toSelect = document.getElementById("toSelect");
 const buildBtn = document.getElementById("buildBtn");
-const swapBtn = document.getElementById("swapBtn");
+// swapBtn removed since start is fixed
 const routeSummary = document.getElementById("routeSummary");
 const stage = document.getElementById("stage");
 const timeline = document.getElementById("timeline");
@@ -59,41 +66,37 @@ const nextBtn = document.getElementById("nextBtn");
 const photoFrame = document.getElementById("photoFrame");
 const imageLoader = document.getElementById("imageLoader");
 
-// State
 let currentSteps = [];
 let currentStepIndex = 0;
 
-// Initialize
+// populate dropdowns
 populateSelects();
 
-// Event Listeners
-swapBtn.addEventListener("click", () => {
-  const temp = fromSelect.value;
-  fromSelect.value = toSelect.value;
-  toSelect.value = temp;
-});
+// swap button logic removed
 
 buildBtn.addEventListener("click", () => {
   feedback.textContent = "";
-  const start = fromSelect.value;
+  const start = "kings"; // hardcoded fixed start
   const end = toSelect.value;
 
-  if (!start || !end) {
-    feedback.textContent = "Select both a starting point and a destination.";
+  if (!end) {
+    feedback.textContent = "Select a destination.";
     return;
   }
+  
   if (start === end) {
     feedback.textContent = "Start and destination cannot be the same.";
     return;
   }
 
+  // TODO: maybe abstract this routing block later if it gets too complex
   const pathEdges = findShortestRoute(start, end);
   if (!pathEdges.length) {
     feedback.textContent = "No route found for this combination.";
     return;
   }
 
-  // Pre-calculate steps
+  // format into ui steps
   currentSteps = pathEdges.map((edge, i) => ({
     title: `Step ${i + 1} - ${directionLabel(edge.dir)}`,
     desc: edge.text,
@@ -110,7 +113,6 @@ buildBtn.addEventListener("click", () => {
 
   currentStepIndex = 0;
   
-  // Show UI elements
   routeSummary.classList.remove("hidden");
   stage.classList.remove("hidden");
   timeline.classList.remove("hidden");
@@ -146,17 +148,17 @@ nextBtn.addEventListener("click", () => {
 function renderStep() {
   const step = currentSteps[currentStepIndex];
   
-  // Start transition out
+  // trigger css transition
   photoFrame.classList.remove('in');
   photoFrame.classList.add('out');
   stepDesc.classList.remove('in');
   stepDesc.classList.add('out');
   
-  // Disable buttons during transition
+  // lock buttons until we load (prevent double click bugs)
   prevBtn.disabled = true;
   nextBtn.disabled = true;
 
-  // Wait for fade out
+  // wait for the fade to finish before swapping the text
   setTimeout(() => {
     stepTitle.textContent = step.title;
     stepCounter.textContent = `Step ${currentStepIndex + 1} of ${currentSteps.length}`;
@@ -164,16 +166,14 @@ function renderStep() {
     arrowText.textContent = directionLabel(step.dir);
     drawArrow(step.dir);
     
-    // Show loader
+    // flash the loader
     imageLoader.classList.remove('out');
     imageLoader.classList.add('in');
     
-    // Preload image
     const img = new Image();
     img.onload = () => {
       stepPhoto.src = step.photo;
       
-      // Hide loader, show frame
       imageLoader.classList.remove('in');
       imageLoader.classList.add('out');
       
@@ -183,14 +183,14 @@ function renderStep() {
       stepDesc.classList.remove('out');
       stepDesc.classList.add('in');
       
-      // Re-enable buttons based on state
       prevBtn.disabled = currentStepIndex === 0;
       nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
     };
     
-    // Fallback if image fails or takes too long (timeout)
+    // fallback if the image is missing entirely
     img.onerror = () => {
-      stepPhoto.src = step.photo; // Let the browser handle broken image icon naturally
+      // console.log("error loading photo", step.photo);
+      stepPhoto.src = step.photo;
       imageLoader.classList.add('out');
       photoFrame.classList.add('in');
       stepDesc.classList.add('in');
@@ -204,9 +204,10 @@ function renderStep() {
 
 function renderTimeline() {
   timeline.innerHTML = "";
+  
   currentSteps.forEach((step, index) => {
     const card = document.createElement("article");
-    card.className = "timeline-card glass-panel" + (index === currentStepIndex ? " active" : "");
+    card.className = "timeline-card" + (index === currentStepIndex ? " active" : "");
     
     card.innerHTML = `
       <img src="${step.photo}" alt="${step.title}">
@@ -226,19 +227,22 @@ function renderTimeline() {
 }
 
 function populateSelects() {
-  fromSelect.innerHTML = '<option value="" disabled selected>Select Starting Point...</option>';
   toSelect.innerHTML = '<option value="" disabled selected>Select Destination...</option>';
   
   Object.keys(places).forEach(key => {
+    // don't put the starting point in the destination list!
+    if (key === "kings") return; 
+    
     const place = places[key];
     const optionText = `${place.icon} ${place.name}`;
     
-    fromSelect.appendChild(new Option(optionText, key));
     toSelect.appendChild(new Option(optionText, key));
   });
 }
 
+// standard bfs routing
 function findShortestRoute(start, end) {
+  // old way: var queue = [{ node: start, path: [] }]; 
   const queue = [{ node: start, path: [] }];
   const visited = { [start]: true };
 
@@ -257,9 +261,10 @@ function findShortestRoute(start, end) {
       }
     });
   }
-  return [];
+  return []; // no route
 }
 
+// simple inline svg drawing for the arrows
 function drawArrow(dir) {
   const color = dir === "arrive" ? "var(--accent-arrive)" : "var(--accent-glow)";
   let path = "";
@@ -271,7 +276,7 @@ function drawArrow(dir) {
   } else if (dir === "arrive") {
     path = '<circle cx="60" cy="60" r="36"/><path d="M42 60l12 12 24-24"/>';
   } else {
-    // straight
+    // defaults straight
     path = '<path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/>';
   }
 
@@ -291,6 +296,7 @@ function reverseDir(dir) {
   return dir;
 }
 
+// matches exactly what you get when finding the end place
 function getArrivalPhoto(place) {
   const arrivalPhotos = {
     library: "images/corridor_lib.jpg",

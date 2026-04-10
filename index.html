@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- author info -->
+  <meta name="author" content="Divya">
+  <!-- TODO: maybe add some meta description later for seo -->
+
   <title>Campus Navigator</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +17,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Ambient Animated Background -->
+
+  <!-- animated background blobs -->
+  <!-- <div class="bg-static"></div> old static bg -->
   <div class="ambient-bg">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -20,21 +27,21 @@
   </div>
 
   <main class="navigator-app">
-    <header class="app-head glass-panel">
+    <header class="app-head">
       <h1>Campus <span class="highlight">Navigator</span></h1>
       <p>Select your route, follow the visual guide, and reach your destination with ease.</p>
     </header>
 
-    <section class="route-controls glass-panel">
+    <section class="route-controls">
       <div class="field">
-        <label for="fromSelect">Starting Point</label>
-        <div class="select-wrapper">
-          <select id="fromSelect"></select>
+        <label>Starting Point</label>
+        <div style="height: 50px; background-color: #2b2b2b; color: #999; border: 1px solid #3d3d3d; border-radius: 6px; padding: 0 15px; font-size: 16px; display: flex; align-items: center; cursor: not-allowed;">
+          🛋 King's Lounge
         </div>
       </div>
-      <button id="swapBtn" class="icon-btn" type="button" title="Swap Locations">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
-      </button>
+      
+      <!-- swap button removed since we only start at king's lounge now -->
+
       <div class="field">
         <label for="toSelect">Destination</label>
         <div class="select-wrapper">
@@ -44,18 +51,19 @@
       <button id="buildBtn" class="primary-btn" type="button">Find Route</button>
     </section>
 
+    <!-- validation errors go here -->
     <p id="feedback" class="feedback"></p>
 
-    <!-- Route summary -->
-    <section id="routeSummary" class="route-summary glass-panel hidden"></section>
+    <!-- quick route info (hidden by default) -->
+    <section id="routeSummary" class="route-summary hidden"></section>
 
-    <!-- Main Navigation Stage -->
-    <section id="stage" class="stage glass-panel hidden">
+    <section id="stage" class="stage hidden">
       <div class="stage-top">
         <strong id="stepTitle" class="step-title"></strong>
         <span id="stepCounter" class="step-counter"></span>
       </div>
 
+      <!-- the main photo area -->
       <div class="photo-frame-wrapper">
         <div id="imageLoader" class="skeleton-loader fade">
           <div class="spinner"></div>
@@ -71,6 +79,7 @@
         </div>
       </div>
 
+      <!-- description text -->
       <p id="stepDesc" class="step-desc fade"></p>
 
       <div class="step-actions">
@@ -85,7 +94,8 @@
       </div>
     </section>
 
-    <!-- Route timeline timeline -->
+    <!-- timeline at the bottom -->
+    <!-- maybe add horizontal scroll if it gets too long later -->
     <section id="timeline" class="timeline hidden"></section>
   </main>
 
