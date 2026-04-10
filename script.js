@@ -3,7 +3,7 @@
  * Divya
  */
 
-const places = {
+var places = {
   entrance: { name: "Main Entrance", icon: "🏫" },
   library: { name: "Library", icon: "📚" },
   kings: { name: "King's Lounge", icon: "🛋" },
@@ -13,46 +13,36 @@ const places = {
   it: { name: "IT Department", icon: "💻" }
 };
 
-const edges = [
-  // Unified Starting Step for all King's Lounge routes
+var edges = [
   { from: "kings", to: "wp_start", dir: "straight", photo: "images/hall_center.jpg", text: "Exit King's Lounge into the center hall." },
-
-  // Center Hall to Main Entrance
   { from: "wp_start", to: "entrance", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk down the corridor to the Main Entrance." },
-
-  // Center Hall to Library sequence
   { from: "wp_start", to: "wp_k1", dir: "right", photo: "images/lobby.jpg", text: "Walk toward the main lobby." },
   { from: "wp_k1", to: "wp_k2", dir: "right", photo: "images/corridor_west.jpg", text: "Take the West corridor." },
   { from: "wp_k2", to: "library", dir: "left", photo: "images/walkway.jpg", text: "Follow the walkway into the Library wing." },
-
-  // Center Hall to Indigenous sequence
   { from: "wp_start", to: "wp_i2", dir: "left", photo: "images/hall_turn.jpg", text: "Continue straight past the turn." },
   { from: "wp_i2", to: "indigenous", dir: "right", photo: "images/entrance.jpg", text: "Turn right toward the Indigenous Center." },
-
-  // Indigenous to Theater sequence (3 steps)
   { from: "indigenous", to: "wp_t1", dir: "left", photo: "images/hallway_south.jpg", text: "Take the south hallway." },
   { from: "wp_t1", to: "wp_t2", dir: "straight", photo: "images/hall_theater.jpg", text: "Move through the theater hall." },
   { from: "wp_t2", to: "theater", dir: "straight", photo: "images/passage_a.jpg", text: "Proceed down Passage A to the Theater." },
-
-  // Library to Registrar sequence (2 steps)
   { from: "library", to: "wp_r1", dir: "right", photo: "images/junction.jpg", text: "Turn right at the main junction." },
   { from: "wp_r1", to: "registrar", dir: "left", photo: "images/corridor_east.jpg", text: "Enter the East corridor toward Registrar." },
-
-  // Registrar to IT sequence (3 steps)
   { from: "registrar", to: "wp_it1", dir: "straight", photo: "images/passage_b.jpg", text: "Walk down Passage B." },
   { from: "wp_it1", to: "wp_it2", dir: "right", photo: "images/passage_c.jpg", text: "Turn right into Passage C." },
   { from: "wp_it2", to: "it", dir: "straight", photo: "images/hallway_north.jpg", text: "Follow the North hallway to IT." }
 ];
 
-// build the map so we can look up routes locally 
-let byFrom = {}; // changing to let just in case we fetch data later
-edges.forEach(edge => {
-  if (!byFrom[edge.from]) byFrom[edge.from] = [];
-  if (!byFrom[edge.to]) byFrom[edge.to] = [];
+var byFrom = {};
+for (var i = 0; i < edges.length; i++) {
+  var edge = edges[i];
+  if (!byFrom[edge.from]) {
+    byFrom[edge.from] = [];
+  }
+  if (!byFrom[edge.to]) {
+    byFrom[edge.to] = [];
+  }
   
   byFrom[edge.from].push(edge);
   
-  // push the reverse path automatically
   byFrom[edge.to].push({
     from: edge.to,
     to: edge.from,
@@ -60,38 +50,36 @@ edges.forEach(edge => {
     photo: edge.photo,
     text: edge.text
   });
-});
+}
 
-const fromSelect = document.getElementById("fromSelect");
-const toSelect = document.getElementById("toSelect");
-const buildBtn = document.getElementById("buildBtn");
-const routeSummary = document.getElementById("routeSummary");
-const stage = document.getElementById("stage");
-const timeline = document.getElementById("timeline");
-const feedback = document.getElementById("feedback");
+var toSelect = document.getElementById("toSelect");
+var buildBtn = document.getElementById("buildBtn");
+var routeSummary = document.getElementById("routeSummary");
+var stage = document.getElementById("stage");
+var timeline = document.getElementById("timeline");
+var feedback = document.getElementById("feedback");
 
-const stepTitle = document.getElementById("stepTitle");
-const stepCounter = document.getElementById("stepCounter");
-const stepPhoto = document.getElementById("stepPhoto");
-const arrowSvg = document.getElementById("arrowSvg");
-const arrowText = document.getElementById("arrowText");
-const stepDesc = document.getElementById("stepDesc");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
+var stepTitle = document.getElementById("stepTitle");
+var stepCounter = document.getElementById("stepCounter");
+var stepPhoto = document.getElementById("stepPhoto");
+var arrowSvg = document.getElementById("arrowSvg");
+var arrowText = document.getElementById("arrowText");
+var stepDesc = document.getElementById("stepDesc");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
 
-const photoFrame = document.getElementById("photoFrame");
-const imageLoader = document.getElementById("imageLoader");
+var photoFrame = document.getElementById("photoFrame");
+var imageLoader = document.getElementById("imageLoader");
 
-let currentSteps = [];
-let currentStepIndex = 0;
+var currentSteps = [];
+var currentStepIndex = 0;
 
-// populate dropdowns
 populateSelects();
 
-buildBtn.addEventListener("click", () => {
+buildBtn.addEventListener("click", function() {
   feedback.textContent = "";
-  const start = "kings"; // hardcoded fixed start
-  const end = toSelect.value;
+  var start = "kings";
+  var end = toSelect.value;
 
   if (!end) {
     feedback.textContent = "Select a destination.";
@@ -103,46 +91,48 @@ buildBtn.addEventListener("click", () => {
     return;
   }
 
-  const pathEdges = findShortestRoute(start, end);
-  if (!pathEdges.length) {
+  var pathEdges = findShortestRoute(start, end);
+  if (pathEdges.length === 0) {
     feedback.textContent = "No route found for this combination.";
     return;
   }
 
-  // format into ui steps
-  currentSteps = pathEdges.map((edge, i) => ({
-    title: `Step ${i + 1} - ${directionLabel(edge.dir)}`,
-    desc: edge.text,
-    photo: edge.photo,
-    dir: edge.dir
-  }));
+  currentSteps = [];
+  for (var j = 0; j < pathEdges.length; j++) {
+    var e = pathEdges[j];
+    var stepNum = j + 1;
+    currentSteps.push({
+      title: "Step " + stepNum + " - " + directionLabel(e.dir),
+      desc: e.text,
+      photo: e.photo,
+      dir: e.dir
+    });
+  }
 
   currentSteps.push({
     title: "Arrived",
-    desc: `You have successfully reached the ${places[end].name}.`,
+    desc: "You have successfully reached the " + places[end].name + ".",
     photo: getArrivalPhoto(end),
     dir: "arrive"
   });
 
   currentStepIndex = 0;
   
-  routeSummary.classList.remove("hidden");
-  stage.classList.remove("hidden");
-  timeline.classList.remove("hidden");
+  routeSummary.style.display = "block";
+  stage.style.display = "block";
+  timeline.style.display = "block";
   
-  routeSummary.innerHTML = `
-    <span>${places[start].icon} ${places[start].name}</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    <span>${places[end].icon} ${places[end].name}</span>
-    <span style="opacity:0.5; margin-left:10px;">|</span>
-    <span style="margin-left:10px;">${currentSteps.length} steps</span>
-  `;
+  routeSummary.innerHTML = "<span>" + places[start].icon + " " + places[start].name + "</span>" +
+    " <span style='opacity:0.5; margin:0 10px;'>&rarr;</span> " +
+    "<span>" + places[end].icon + " " + places[end].name + "</span>" +
+    "<span style='opacity:0.5; margin-left:10px;'>|</span>" +
+    "<span style='margin-left:10px;'>" + currentSteps.length + " steps</span>";
   
   renderStep();
   renderTimeline();
 });
 
-prevBtn.addEventListener("click", () => {
+prevBtn.addEventListener("click", function() {
   if (currentStepIndex > 0) {
     currentStepIndex--;
     renderStep();
@@ -150,7 +140,7 @@ prevBtn.addEventListener("click", () => {
   }
 });
 
-nextBtn.addEventListener("click", () => {
+nextBtn.addEventListener("click", function() {
   if (currentStepIndex < currentSteps.length - 1) {
     currentStepIndex++;
     renderStep();
@@ -159,56 +149,43 @@ nextBtn.addEventListener("click", () => {
 });
 
 function renderStep() {
-  const step = currentSteps[currentStepIndex];
+  var step = currentSteps[currentStepIndex];
   
-  // trigger css transition
-  photoFrame.classList.remove('in');
-  photoFrame.classList.add('out');
-  stepDesc.classList.remove('in');
-  stepDesc.classList.add('out');
+  photoFrame.className = "out";
+  stepDesc.className = "out";
   
-  // lock buttons until we load (prevent double click bugs)
   prevBtn.disabled = true;
   nextBtn.disabled = true;
 
-  // wait for the fade to finish before swapping the text
-  setTimeout(() => {
+  setTimeout(function() {
     stepTitle.textContent = step.title;
-    stepCounter.textContent = `Step ${currentStepIndex + 1} of ${currentSteps.length}`;
+    var currentNum = currentStepIndex + 1;
+    stepCounter.textContent = "Step " + currentNum + " of " + currentSteps.length;
     stepDesc.textContent = step.desc;
     arrowText.textContent = directionLabel(step.dir);
     drawArrow(step.dir);
     
-    // flash the loader
-    imageLoader.classList.remove('out');
-    imageLoader.classList.add('in');
+    imageLoader.className = "in";
     
-    const img = new Image();
-    img.onload = () => {
+    var img = new Image();
+    img.onload = function() {
       stepPhoto.src = step.photo;
+      imageLoader.className = "out";
+      photoFrame.className = "in";
+      stepDesc.className = "in";
       
-      imageLoader.classList.remove('in');
-      imageLoader.classList.add('out');
-      
-      photoFrame.classList.remove('out');
-      photoFrame.classList.add('in');
-      
-      stepDesc.classList.remove('out');
-      stepDesc.classList.add('in');
-      
-      prevBtn.disabled = currentStepIndex === 0;
-      nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
+      prevBtn.disabled = (currentStepIndex === 0);
+      nextBtn.disabled = (currentStepIndex === currentSteps.length - 1);
     };
     
-    // fallback if the image is missing entirely
-    img.onerror = () => {
-      // console.log("error loading photo", step.photo);
+    img.onerror = function() {
       stepPhoto.src = step.photo;
-      imageLoader.classList.add('out');
-      photoFrame.classList.add('in');
-      stepDesc.classList.add('in');
-      prevBtn.disabled = currentStepIndex === 0;
-      nextBtn.disabled = currentStepIndex === currentSteps.length - 1;
+      imageLoader.className = "out";
+      photoFrame.className = "in";
+      stepDesc.className = "in";
+      
+      prevBtn.disabled = (currentStepIndex === 0);
+      nextBtn.disabled = (currentStepIndex === currentSteps.length - 1);
     };
     
     img.src = step.photo;
@@ -218,67 +195,93 @@ function renderStep() {
 function renderTimeline() {
   timeline.innerHTML = "";
   
-  currentSteps.forEach((step, index) => {
-    const card = document.createElement("article");
-    card.className = "timeline-card" + (index === currentStepIndex ? " active" : "");
-    
-    card.innerHTML = `
-      <img src="${step.photo}" alt="${step.title}">
-      <p>${index + 1}. ${directionLabel(step.dir)}</p>
-    `;
-    
-    card.addEventListener("click", () => {
-      if (currentStepIndex !== index) {
-        currentStepIndex = index;
-        renderStep();
-        renderTimeline();
+  for (var k = 0; k < currentSteps.length; k++) {
+    (function(index) {
+      var step = currentSteps[index];
+      var card = document.createElement("div");
+      
+      var className = "timeline-card";
+      if (index === currentStepIndex) {
+        className += " active";
       }
-    });
-    
-    timeline.appendChild(card);
-  });
+      card.className = className;
+      
+      var stepNumber = index + 1;
+      card.innerHTML = "<img src='" + step.photo + "' alt='" + step.title + "'>" +
+        "<p>" + stepNumber + ". " + directionLabel(step.dir) + "</p>";
+      
+      card.addEventListener("click", function() {
+        if (currentStepIndex !== index) {
+          currentStepIndex = index;
+          renderStep();
+          renderTimeline();
+        }
+      });
+      
+      timeline.appendChild(card);
+    })(k);
+  }
 }
 
 function populateSelects() {
-  toSelect.innerHTML = '<option value="" disabled selected>Select Destination...</option>';
+  toSelect.innerHTML = "<option value='' disabled selected>Select Destination...</option>";
   
-  Object.keys(places).forEach(key => {
-    // don't put the starting point in the destination list!
-    if (key === "kings") return; 
-    
-    const place = places[key];
-    const optionText = `${place.icon} ${place.name}`;
-    
-    toSelect.appendChild(new Option(optionText, key));
-  });
+  for (var key in places) {
+    if (places.hasOwnProperty(key)) {
+      if (key === "kings") {
+        continue;
+      }
+      var place = places[key];
+      var optionText = place.icon + " " + place.name;
+      toSelect.appendChild(new Option(optionText, key));
+    }
+  }
 }
 
-// standard bfs routing
 function findShortestRoute(start, end) {
-  const queue = [{ node: start, path: [] }];
-  const visited = { [start]: true };
+  var queue = [{ node: start, path: [] }];
+  var visited = {};
+  visited[start] = true;
 
-  while (queue.length) {
-    const current = queue.shift();
-    if (current.node === end) return current.path;
+  while (queue.length > 0) {
+    var current = queue.shift();
+    if (current.node === end) {
+      return current.path;
+    }
 
-    const neighbors = byFrom[current.node] || [];
-    neighbors.forEach(edge => {
+    var neighbors = byFrom[current.node];
+    if (!neighbors) {
+      neighbors = [];
+    }
+    
+    for (var m = 0; m < neighbors.length; m++) {
+      var edge = neighbors[m];
       if (!visited[edge.to]) {
         visited[edge.to] = true;
+        
+        var newPath = [];
+        for (var n = 0; n < current.path.length; n++) {
+          newPath.push(current.path[n]);
+        }
+        newPath.push(edge);
+        
         queue.push({
           node: edge.to,
-          path: current.path.concat(edge)
+          path: newPath
         });
       }
-    });
+    }
   }
-  return []; // no route
+  return [];
 }
 
 function drawArrow(dir) {
-  const color = dir === "arrive" ? "#34d399" : "#60a5fa";
-  let path = "";
+  var color = "#60a5fa";
+  if (dir === "arrive") {
+    color = "#34d399";
+  }
+  
+  var path = "";
 
   if (dir === "left") {
     path = '<g transform="translate(60 60) rotate(-90) translate(-60 -60)"><path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/></g>';
@@ -287,29 +290,27 @@ function drawArrow(dir) {
   } else if (dir === "arrive") {
     path = '<circle cx="60" cy="60" r="36"/><path d="M42 60l12 12 24-24"/>';
   } else {
-    // defaults straight
     path = '<path d="M60 20L60 100"/><path d="M35 45L60 20L85 45"/>';
   }
 
-  arrowSvg.innerHTML = `<g stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">${path}</g>`;
+  arrowSvg.innerHTML = '<g stroke="' + color + '" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">' + path + '</g>';
 }
 
 function directionLabel(dir) {
-  if (dir === "left") return "Turn Left";
-  if (dir === "right") return "Turn Right";
-  if (dir === "arrive") return "Arrived";
+  if (dir === "left") { return "Turn Left"; }
+  if (dir === "right") { return "Turn Right"; }
+  if (dir === "arrive") { return "Arrived"; }
   return "Go Straight";
 }
 
 function reverseDir(dir) {
-  if (dir === "left") return "right";
-  if (dir === "right") return "left";
+  if (dir === "left") { return "right"; }
+  if (dir === "right") { return "left"; }
   return dir;
 }
 
-// matches exactly what you get when finding the end place
 function getArrivalPhoto(place) {
-  const arrivalPhotos = {
+  var arrivalPhotos = {
     library: "images/corridor_lib.jpg",
     kings: "images/corridor_kings.jpg",
     registrar: "images/corridor_reg.jpg",
@@ -318,5 +319,10 @@ function getArrivalPhoto(place) {
     it: "images/corridor_it.jpg",
     entrance: "images/hallway_main.jpg"
   };
-  return arrivalPhotos[place] || "images/hallway_main.jpg";
+  
+  if (arrivalPhotos[place]) {
+    return arrivalPhotos[place];
+  } else {
+    return "images/hallway_main.jpg";
+  }
 }
