@@ -1,34 +1,62 @@
-/*
- * App Logic for Campus Navigator
- * Divya
- */
+
 
 var places = {
-  entrance: { name: "Main Entrance", icon: "🏫" },
+  entrance: { name: "Theater", icon: "🎭" },
   library: { name: "Library", icon: "📚" },
   kings: { name: "King's Lounge", icon: "🛋" },
   registrar: { name: "Registrar Office", icon: "📄" },
-  indigenous: { name: "Indigenous Center", icon: "🌿" },
-  theater: { name: "Theater", icon: "🎭" },
-  it: { name: "IT Department", icon: "💻" }
+  indigenous: { name: "Indigenous Center", icon: "🏫" },
+  bookstore: { name: "Book Store", icon: "📚" }
 };
 
 var edges = [
-  { from: "kings", to: "wp_start", dir: "straight", photo: "images/hall_center.jpg", text: "Exit King's Lounge into the center hall." },
-  { from: "wp_start", to: "entrance", dir: "straight", photo: "images/hallway_north.jpg", text: "Walk down the corridor to the Main Entrance." },
+  { from: "entrance", to: "wp_start", dir: "straight", photo: "images/hallway_main.jpg", text: "Walk from the Main Entrance down the corridor." },
   { from: "wp_start", to: "wp_k1", dir: "right", photo: "images/lobby.jpg", text: "Walk toward the main lobby." },
   { from: "wp_k1", to: "wp_k2", dir: "right", photo: "images/corridor_west.jpg", text: "Take the West corridor." },
-  { from: "wp_k2", to: "library", dir: "left", photo: "images/walkway.jpg", text: "Follow the walkway into the Library wing." },
-  { from: "wp_start", to: "wp_i2", dir: "left", photo: "images/hall_turn.jpg", text: "Continue straight past the turn." },
-  { from: "wp_i2", to: "indigenous", dir: "right", photo: "images/entrance.jpg", text: "Turn right toward the Indigenous Center." },
-  { from: "indigenous", to: "wp_t1", dir: "left", photo: "images/hallway_south.jpg", text: "Take the south hallway." },
-  { from: "wp_t1", to: "wp_t2", dir: "straight", photo: "images/hall_theater.jpg", text: "Move through the theater hall." },
-  { from: "wp_t2", to: "theater", dir: "straight", photo: "images/passage_a.jpg", text: "Proceed down Passage A to the Theater." },
-  { from: "library", to: "wp_r1", dir: "right", photo: "images/junction.jpg", text: "Turn right at the main junction." },
-  { from: "wp_r1", to: "registrar", dir: "left", photo: "images/corridor_east.jpg", text: "Enter the East corridor toward Registrar." },
-  { from: "registrar", to: "wp_it1", dir: "straight", photo: "images/passage_b.jpg", text: "Walk down Passage B." },
-  { from: "wp_it1", to: "wp_it2", dir: "right", photo: "images/passage_c.jpg", text: "Turn right into Passage C." },
-  { from: "wp_it2", to: "it", dir: "straight", photo: "images/hallway_north.jpg", text: "Follow the North hallway to IT." }
+  { from: "entrance", to: "lib1", dir: "left", photo: "images/lib_step_1.jpeg", text: "Image 1 (Start Point)\nTurn left \u2192 go to Image 2" },
+  { from: "lib1", to: "lib2", dir: "left", photo: "images/lib_step_2.jpeg", text: "Image 2\nGo straight\nThen turn left \u2192 go to Image 3" },
+  { from: "lib2", to: "lib3", dir: "right", photo: "images/lib_step_3.jpeg", text: "Image 3\nGo straight\nThen turn right\nCafeteria is on the right \u2192 Image 4" },
+  { from: "lib3", to: "lib4", dir: "left", photo: "images/lib_step_4.jpeg", text: "Image 4 (Cafeteria Point)\nTurn left \u2192 go to Image 5" },
+  { from: "lib4", to: "lib5", dir: "straight", photo: "images/lib_step_5.jpeg", text: "Image 5\nGo straight \u2192 go to Image 6" },
+  { from: "lib5", to: "lib6", dir: "left", photo: "images/lib_step_6.jpeg", text: "Image 6\nTurn left \u2192 go to Image 7" },
+  { from: "lib6", to: "lib7", dir: "left", photo: "images/lib_step_7.jpeg", text: "Image 7\nTurn left \u2192 go to Image 8" },
+  { from: "lib7", to: "library", dir: "left", photo: "images/lib_step_8.jpeg", text: "Image 8\nGo straight\nThen turn left\nLibrary is on the left \u2192 Image 10" },
+  { from: "entrance", to: "reg1", dir: "left", photo: "images/reg_step_1.jpeg", text: "Start at Point 1. Turn left to reach Point 2." },
+  { from: "entrance", to: "ind1", dir: "left", photo: "images/pdf_step_1.jpeg", text: "1 then left" },
+  { from: "ind1", to: "ind2", dir: "straight", photo: "images/pdf_step_2.jpeg", text: "2 go straight" },
+  { from: "ind2", to: "ind3", dir: "left", photo: "images/pdf_step_3.jpeg", text: "and then left" },
+  { from: "ind3", to: "ind4", dir: "straight", photo: "images/pdf_step_4.jpeg", text: "3 go straight" },
+  { from: "ind4", to: "ind5", dir: "right", photo: "images/pdf_step_5.jpeg", text: "and then right is cafeteria" },
+  { from: "ind5", to: "ind6", dir: "left", photo: "images/pdf_step_6.jpeg", text: "4 and then left" },
+  { from: "ind6", to: "ind7", dir: "straight", photo: "images/pdf_step_7.jpeg", text: "5 go straight" },
+  { from: "ind7", to: "ind8", dir: "right", photo: "images/pdf_step_8.jpeg", text: "6 and go right" },
+  { from: "ind8", to: "ind9", dir: "straight", photo: "images/pdf_step_9.jpeg", text: "7 go straight" },
+  { from: "ind9", to: "ind10", dir: "left", photo: "images/pdf_step_10.jpeg", text: "and left" },
+  { from: "ind10", to: "ind11", dir: "straight", photo: "images/pdf_step_11.jpeg", text: "8 go straight" },
+  { from: "ind11", to: "ind12", dir: "straight", photo: "images/pdf_step_12.jpeg", text: "9 go straight" },
+  { from: "ind12", to: "indigenous", dir: "right", photo: "images/pdf_step_13.jpeg", text: "10 right is indigenous academic centre" },
+  { from: "entrance", to: "king1", dir: "left", photo: "images/king_step_1.jpeg", text: "Image 1 (Start)\nTurn left \u2192 go to Image 2" },
+  { from: "king1", to: "king2", dir: "left", photo: "images/king_step_2.jpeg", text: "Image 2\nGo straight\nThen turn left \u2192 go to Image 3" },
+  { from: "king2", to: "king3", dir: "right", photo: "images/king_step_3.jpeg", text: "Image 3\nGo straight\nThen turn right\nCafeteria is on the right \u2192 go to Image 4" },
+  { from: "king3", to: "king4", dir: "left", photo: "images/king_step_4.jpeg", text: "Image 4\nTurn left \u2192 go to Image 5" },
+  { from: "king4", to: "king5", dir: "straight", photo: "images/king_step_5.jpeg", text: "Image 5\nGo straight \u2192 go to Image 6" },
+  { from: "king5", to: "king6", dir: "left", photo: "images/king_step_6.jpeg", text: "Image 6\nGo straight\nThen turn left \u2192 go to Image 7" },
+  { from: "king6", to: "king7", dir: "left", photo: "images/king_step_7.jpeg", text: "Image 7\nTurn left \u2192 go to Image 8" },
+  { from: "king7", to: "king8", dir: "straight", photo: "images/king_step_8.jpeg", text: "Image 8\nGo straight \u2192 go to Image 9" },
+  { from: "king8", to: "king9", dir: "straight", photo: "images/king_step_9.jpeg", text: "Image 9\nGo straight \u2192 go to Image 10" },
+  { from: "king9", to: "king10", dir: "left", photo: "images/king_step_10.jpeg", text: "Image 10\nGo straight\nThen turn left \u2192 go to Image 11" },
+  { from: "king10", to: "kings", dir: "straight", photo: "images/king_step_11.jpeg", text: "Image 11\nGo straight \u2192 go to Image 12" },
+  { from: "reg1", to: "reg2", dir: "straight", photo: "images/reg_step_2.jpeg", text: "Go straight to reach Point 3." },
+  { from: "reg2", to: "reg3", dir: "left", photo: "images/reg_step_3.jpeg", text: "Turn left at Point 3 and go straight." },
+  { from: "reg3", to: "reg4", dir: "right", photo: "images/reg_step_4.jpeg", text: "Turn right — Cafeteria is on the right (Point 4)." },
+  { from: "reg4", to: "reg5", dir: "left", photo: "images/reg_step_5.jpeg", text: "From Point 4, turn left to reach Point 5." },
+  { from: "reg5", to: "reg6", dir: "straight", photo: "images/reg_step_6.jpeg", text: "Go straight to reach Point 6." },
+  { from: "reg6", to: "registrar", dir: "left", photo: "images/reg_step_7.jpeg", text: "Turn left to reach Point 7. Turn left again to reach Point 8." },
+  { from: "entrance", to: "book1", dir: "left", photo: "images/book_step_1.jpeg", text: "Image 1 (Start Point)\nTurn left \u2192 reach Image 2" },
+  { from: "book1", to: "book2", dir: "left", photo: "images/book_step_2.jpeg", text: "Image 2\nGo straight\nThen turn left \u2192 reach Image 3" },
+  { from: "book2", to: "book3", dir: "right", photo: "images/book_step_3.jpeg", text: "Image 3\nGo straight\nThen turn right\nCafeteria is on the right \u2192 reach Image 4" },
+  { from: "book3", to: "book4", dir: "left", photo: "images/book_step_4.jpeg", text: "Image 4 (Cafeteria Point)\nTurn left \u2192 reach Image 5" },
+  { from: "book4", to: "bookstore", dir: "straight", photo: "images/book_step_5.jpeg", text: "Image 5\nGo straight \u2192 reach Image 6" }
 ];
 
 var byFrom = {};
@@ -78,7 +106,7 @@ populateSelects();
 
 buildBtn.addEventListener("click", function() {
   feedback.textContent = "";
-  var start = "kings";
+  var start = "entrance";
   var end = toSelect.value;
 
   if (!end) {
@@ -109,9 +137,18 @@ buildBtn.addEventListener("click", function() {
     });
   }
 
+  var arrivalDesc = "You have successfully reached the " + places[end].name + ".";
+  if (end === "registrar") {
+    arrivalDesc = "Go straight. Turn right — Registrar Office is on the right.";
+  } else if (end === "bookstore") {
+    arrivalDesc = "Image 6\nGo straight\nBookstore is ahead / at this point (Destination)";
+  } else if (end === "kings") {
+    arrivalDesc = "Image 12 (Destination)\nTurn right\nKing's Lounge is on the right";
+  }
+  
   currentSteps.push({
     title: "Arrived",
-    desc: "You have successfully reached the " + places[end].name + ".",
+    desc: arrivalDesc,
     photo: getArrivalPhoto(end),
     dir: "arrive"
   });
@@ -161,7 +198,7 @@ function renderStep() {
     stepTitle.textContent = step.title;
     var currentNum = currentStepIndex + 1;
     stepCounter.textContent = "Step " + currentNum + " of " + currentSteps.length;
-    stepDesc.textContent = step.desc;
+    stepDesc.innerHTML = step.desc.replace(/\n/g, '<br>');
     arrowText.textContent = directionLabel(step.dir);
     drawArrow(step.dir);
     
@@ -228,7 +265,7 @@ function populateSelects() {
   
   for (var key in places) {
     if (places.hasOwnProperty(key)) {
-      if (key === "kings") {
+      if (key === "entrance") {
         continue;
       }
       var place = places[key];
@@ -311,12 +348,11 @@ function reverseDir(dir) {
 
 function getArrivalPhoto(place) {
   var arrivalPhotos = {
-    library: "images/corridor_lib.jpg",
-    kings: "images/corridor_kings.jpg",
-    registrar: "images/corridor_reg.jpg",
-    indigenous: "images/hallway_board.jpg",
-    theater: "images/theater_area.jpg",
-    it: "images/corridor_it.jpg",
+    library: "images/lib_step_10.jpeg",
+    kings: "images/king_step_12.jpeg",
+    registrar: "images/reg_step_8.jpeg",
+    indigenous: "images/pdf_step_14.jpeg",
+    bookstore: "images/book_step_6.jpeg",
     entrance: "images/hallway_main.jpg"
   };
   
